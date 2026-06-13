@@ -1,0 +1,1798 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>LifeTodo — همه چیز در یک جا</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0d17;
+    --surface: #1a1726;
+    --surface2: #221e33;
+    --border: #2e2847;
+    --accent: #7c5cbf;
+    --accent2: #a07de0;
+    --gold: #e8b84b;
+    --gold2: #f5d07a;
+    --text: #ede9f8;
+    --text2: #9d93bb;
+    --text3: #5e5676;
+    --danger: #e05c7c;
+    --success: #4ecb8c;
+    --info: #5b9cf5;
+    --warn: #f5a623;
+
+    --cat-study: #5b9cf5;
+    --cat-life: #4ecb8c;
+    --cat-health: #e05c7c;
+    --cat-finance: #e8b84b;
+    --cat-social: #a07de0;
+    --cat-personal: #f5a623;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  
+  html { font-size: 16px; }
+  
+  body {
+    font-family: 'Vazirmatn', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── AUTH SCREEN ── */
+  #auth-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, #2a1f4a 0%, var(--bg) 70%);
+  }
+
+  .auth-box {
+    width: 100%;
+    max-width: 400px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 40px 32px;
+    box-shadow: 0 40px 80px rgba(0,0,0,.6);
+  }
+
+  .auth-logo {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .auth-logo .logo-ring {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--gold));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-bottom: 12px;
+    box-shadow: 0 0 40px rgba(124,92,191,.4);
+  }
+
+  .auth-logo h1 { font-size: 24px; font-weight: 700; color: var(--text); }
+  .auth-logo p { font-size: 13px; color: var(--text2); margin-top: 4px; }
+
+  .auth-tabs {
+    display: flex;
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 24px;
+    gap: 4px;
+  }
+
+  .auth-tab {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: transparent;
+    color: var(--text2);
+    font-family: 'Vazirmatn', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+
+  .auth-tab.active {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(124,92,191,.4);
+  }
+
+  .auth-form { display: flex; flex-direction: column; gap: 16px; }
+
+  .input-group { display: flex; flex-direction: column; gap: 6px; }
+
+  .input-group label { font-size: 13px; color: var(--text2); font-weight: 500; }
+
+  .input-group input {
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 13px 16px;
+    color: var(--text);
+    font-family: 'Vazirmatn', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color .2s;
+    direction: ltr;
+    text-align: right;
+  }
+
+  .input-group input:focus { border-color: var(--accent); }
+  .input-group input::placeholder { color: var(--text3); }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: 12px;
+    padding: 14px;
+    color: #fff;
+    font-family: 'Vazirmatn', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+    box-shadow: 0 4px 16px rgba(124,92,191,.35);
+    margin-top: 4px;
+  }
+
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(124,92,191,.5); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+  .auth-error {
+    background: rgba(224,92,124,.12);
+    border: 1px solid rgba(224,92,124,.3);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--danger);
+    display: none;
+  }
+
+  /* ── MAIN APP ── */
+  #app-screen { display: none; min-height: 100vh; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    position: fixed;
+    top: 0; right: 0;
+    width: 280px;
+    height: 100vh;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    transition: transform .3s cubic-bezier(.4,0,.2,1);
+  }
+
+  .sidebar-header {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .user-badge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .avatar {
+    width: 44px; height: 44px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, var(--accent), var(--gold));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .user-info h3 { font-size: 15px; font-weight: 600; }
+  .user-info p { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+  .sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+
+  .nav-section-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--text3);
+    font-weight: 600;
+    padding: 8px 8px 4px;
+    margin-top: 8px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 12px;
+    border-radius: 11px;
+    cursor: pointer;
+    transition: all .15s;
+    margin-bottom: 2px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text2);
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: right;
+    font-family: 'Vazirmatn', sans-serif;
+  }
+
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+
+  .nav-item.active { background: rgba(124,92,191,.15); color: var(--accent2); }
+
+  .nav-item .nav-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-right: auto;
+  }
+
+  .nav-item .badge {
+    background: var(--surface2);
+    border-radius: 6px;
+    padding: 2px 7px;
+    font-size: 11px;
+    color: var(--text3);
+    font-family: 'Inter', sans-serif;
+    margin-right: auto;
+  }
+
+  .sidebar-footer {
+    padding: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .btn-logout {
+    width: 100%;
+    padding: 10px;
+    background: rgba(224,92,124,.1);
+    border: 1px solid rgba(224,92,124,.2);
+    border-radius: 10px;
+    color: var(--danger);
+    font-family: 'Vazirmatn', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .2s;
+  }
+
+  .btn-logout:hover { background: rgba(224,92,124,.2); }
+
+  /* ── MAIN CONTENT ── */
+  .main {
+    margin-right: 280px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(15,13,23,.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .topbar h2 { font-size: 20px; font-weight: 700; flex: 1; }
+
+  .menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 8px;
+  }
+
+  .content { padding: 28px; flex: 1; max-width: 860px; }
+
+  /* ── OVERVIEW CARDS ── */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .overview-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .overview-card::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 60px; height: 60px;
+    border-radius: 0 16px 0 100%;
+    opacity: .08;
+  }
+
+  .ov-icon { font-size: 22px; }
+  .ov-num { font-size: 28px; font-weight: 700; font-family: 'Inter', sans-serif; line-height: 1; }
+  .ov-label { font-size: 12px; color: var(--text2); }
+
+  /* ── CATEGORY RINGS ── */
+  .rings-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+
+  .ring-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all .2s;
+    flex: 1;
+    min-width: 140px;
+  }
+
+  .ring-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .ring-card.active { border-color: var(--accent); background: rgba(124,92,191,.08); }
+
+  .ring-wrap { position: relative; width: 44px; height: 44px; flex-shrink: 0; }
+
+  .ring-wrap svg { transform: rotate(-90deg); }
+
+  .ring-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .ring-info h4 { font-size: 13px; font-weight: 600; }
+  .ring-info p { font-size: 11px; color: var(--text2); margin-top: 2px; font-family: 'Inter', sans-serif; }
+
+  /* ── ADD TODO ── */
+  .add-todo-bar {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 6px 6px 6px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+    transition: border-color .2s;
+  }
+
+  .add-todo-bar:focus-within { border-color: var(--accent); }
+
+  .add-todo-bar input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'Vazirmatn', sans-serif;
+    font-size: 14px;
+    padding: 8px 4px;
+  }
+
+  .add-todo-bar input::placeholder { color: var(--text3); }
+
+  .add-controls { display: flex; align-items: center; gap: 6px; }
+
+  .cat-select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 7px 10px;
+    color: var(--text);
+    font-family: 'Vazirmatn', sans-serif;
+    font-size: 12px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .prio-select {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 7px 10px;
+    color: var(--text);
+    font-family: 'Vazirmatn', sans-serif;
+    font-size: 12px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .date-input {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 7px 10px;
+    color: var(--text);
+    font-family: 'Vazirmatn', sans-serif;
+    font-size: 12px;
+    outline: none;
+    cursor: pointer;
+    width: 130px;
+  }
+
+  .date-input::-webkit-calendar-picker-indicator { filter: invert(.7); cursor: pointer; }
+
+  .btn-add {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: 10px;
+    padding: 9px 18px;
+    color: #fff;
+    font-family: 'Vazirmatn', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+
+  .btn-add:hover { box-shadow: 0 4px 12px rgba(124,92,191,.4); }
+
+  /* ── FILTERS ── */
+  .filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: none;
+    color: var(--text2);
+    font-family: 'Vazirmatn', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .15s;
+  }
+
+  .filter-btn:hover { border-color: var(--accent2); color: var(--text); }
+  .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* ── TODO LIST ── */
+  .todo-section { margin-bottom: 32px; }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    gap: 10px;
+  }
+
+  .section-header h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+  }
+
+  .section-line { flex: 1; height: 1px; background: var(--border); }
+
+  .todo-item {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 8px;
+    transition: all .2s;
+    cursor: default;
+    animation: slideIn .25s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .todo-item:hover { border-color: var(--accent); }
+  .todo-item.done { opacity: .55; }
+
+  .todo-check {
+    width: 22px; height: 22px;
+    border-radius: 7px;
+    border: 2px solid var(--border);
+    background: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .2s;
+    margin-top: 1px;
+  }
+
+  .todo-check:hover { border-color: var(--accent2); }
+  .todo-check.checked { background: var(--success); border-color: var(--success); }
+  .todo-check.checked::after { content: '✓'; color: #fff; font-size: 12px; font-weight: 700; }
+
+  .todo-body { flex: 1; min-width: 0; }
+
+  .todo-title {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    word-break: break-word;
+  }
+
+  .todo-item.done .todo-title { text-decoration: line-through; color: var(--text2); }
+
+  .todo-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+  }
+
+  .cat-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    background: rgba(255,255,255,.05);
+  }
+
+  .prio-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 500;
+  }
+
+  .prio-high { background: rgba(224,92,124,.15); color: var(--danger); }
+  .prio-mid { background: rgba(232,184,75,.15); color: var(--gold); }
+  .prio-low { background: rgba(78,203,140,.15); color: var(--success); }
+
+  .due-badge {
+    font-size: 11px;
+    color: var(--text3);
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .due-badge.overdue { color: var(--danger); }
+
+  .todo-actions { display: flex; gap: 4px; }
+
+  .todo-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px 7px;
+    border-radius: 7px;
+    color: var(--text3);
+    font-size: 14px;
+    transition: all .15s;
+  }
+
+  .todo-btn:hover { background: var(--surface2); color: var(--text); }
+  .todo-btn.del:hover { color: var(--danger); }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text3);
+  }
+
+  .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: .4; }
+  .empty-state p { font-size: 14px; }
+
+  /* ── HABIT TRACKER ── */
+  .habit-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .habit-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all .2s;
+  }
+
+  .habit-card:hover { border-color: var(--accent2); }
+  .habit-card.done-today { border-color: var(--success); background: rgba(78,203,140,.07); }
+
+  .habit-emoji { font-size: 24px; margin-bottom: 6px; }
+  .habit-name { font-size: 12px; font-weight: 500; margin-bottom: 4px; }
+  .habit-streak { font-size: 11px; color: var(--gold); font-family: 'Inter', sans-serif; }
+
+  /* ── NOTES ── */
+  .notes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+
+  .note-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all .2s;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .note-card:hover { border-color: var(--accent2); transform: translateY(-2px); }
+
+  .note-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+  .note-card p { font-size: 12px; color: var(--text2); flex: 1; line-height: 1.6; }
+  .note-date { font-size: 11px; color: var(--text3); margin-top: 10px; font-family: 'Inter', sans-serif; }
+
+  /* ── FINANCE ── */
+  .finance-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .fin-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .fin-card .fin-num {
+    font-size: 22px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    margin-bottom: 4px;
+  }
+
+  .fin-card .fin-label { font-size: 12px; color: var(--text2); }
+  .fin-card.income .fin-num { color: var(--success); }
+  .fin-card.expense .fin-num { color: var(--danger); }
+  .fin-card.balance .fin-num { color: var(--gold); }
+
+  .transactions { }
+
+  .transaction-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tx-icon {
+    width: 38px; height: 38px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .tx-info { flex: 1; }
+  .tx-info h4 { font-size: 13px; font-weight: 500; }
+  .tx-info p { font-size: 11px; color: var(--text2); margin-top: 2px; }
+  .tx-amount { font-size: 14px; font-weight: 600; font-family: 'Inter', sans-serif; }
+  .tx-amount.inc { color: var(--success); }
+  .tx-amount.exp { color: var(--danger); }
+
+  /* ── MODALS ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.7);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    width: 100%;
+    max-width: 480px;
+    box-shadow: 0 40px 80px rgba(0,0,0,.6);
+    animation: popIn .25s cubic-bezier(.34,1.56,.64,1);
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(.92); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+  }
+
+  .modal-header h3 { font-size: 17px; font-weight: 700; }
+
+  .btn-close {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text2);
+    font-size: 16px;
+    width: 32px; height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all .15s;
+  }
+
+  .btn-close:hover { color: var(--text); }
+
+  .modal-form { display: flex; flex-direction: column; gap: 14px; }
+
+  .modal-form textarea {
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 13px 16px;
+    color: var(--text);
+    font-family: 'Vazirmatn', sans-serif;
+    font-size: 14px;
+    outline: none;
+    resize: vertical;
+    min-height: 100px;
+    transition: border-color .2s;
+  }
+
+  .modal-form textarea:focus { border-color: var(--accent); }
+
+  /* ── MOBILE ── */
+  @media (max-width: 768px) {
+    .sidebar {
+      transform: translateX(100%);
+    }
+
+    .sidebar.open {
+      transform: translateX(0);
+    }
+
+    .sidebar-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.6);
+      z-index: 99;
+      display: none;
+    }
+
+    .sidebar-backdrop.open { display: block; }
+
+    .main { margin-right: 0; }
+
+    .menu-toggle { display: flex; }
+
+    .content { padding: 20px 16px; }
+
+    .topbar { padding: 14px 16px; }
+
+    .topbar h2 { font-size: 17px; }
+
+    .overview-grid { grid-template-columns: repeat(2, 1fr); }
+
+    .rings-row { gap: 8px; }
+
+    .ring-card { min-width: 110px; padding: 12px; }
+
+    .add-controls { flex-wrap: wrap; }
+
+    .finance-summary { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+
+    .fin-card { padding: 12px 8px; }
+    .fin-card .fin-num { font-size: 16px; }
+
+    .modal { padding: 20px; }
+  }
+
+  /* ── SETTINGS PAGE ── */
+  .settings-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+
+  .settings-section-title {
+    padding: 16px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .settings-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    gap: 16px;
+  }
+
+  .settings-item:last-child { border-bottom: none; }
+
+  .settings-item-info h4 { font-size: 14px; font-weight: 500; }
+  .settings-item-info p { font-size: 12px; color: var(--text2); margin-top: 3px; }
+
+  .toggle {
+    width: 42px; height: 24px;
+    background: var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    position: relative;
+    transition: background .2s;
+    flex-shrink: 0;
+    border: none;
+  }
+
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    top: 3px; right: 3px;
+    transition: transform .2s;
+  }
+
+  .toggle.on { background: var(--accent); }
+  .toggle.on::after { transform: translateX(-18px); }
+
+  /* scroll bar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  /* page transition */
+  .page { display: none; }
+  .page.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════ AUTH ══════════════════════ -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="logo-ring">✦</div>
+      <h1>LifeTodo</h1>
+      <p>همه چیز، در یک جا</p>
+    </div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab('login')">ورود</button>
+      <button class="auth-tab" onclick="switchTab('register')">ثبت‌نام</button>
+    </div>
+
+    <div id="auth-error" class="auth-error"></div>
+
+    <!-- Login -->
+    <div id="form-login" class="auth-form">
+      <div class="input-group">
+        <label>ایمیل یا نام کاربری</label>
+        <input type="text" id="login-user" placeholder="example@mail.com" autocomplete="username">
+      </div>
+      <div class="input-group">
+        <label>رمز عبور</label>
+        <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn-primary" onclick="doLogin()">ورود به حساب</button>
+    </div>
+
+    <!-- Register -->
+    <div id="form-register" class="auth-form" style="display:none">
+      <div class="input-group">
+        <label>نام و نام خانوادگی</label>
+        <input type="text" id="reg-name" placeholder="علی محمدی" autocomplete="name">
+      </div>
+      <div class="input-group">
+        <label>ایمیل</label>
+        <input type="email" id="reg-email" placeholder="example@mail.com" autocomplete="email">
+      </div>
+      <div class="input-group">
+        <label>نام کاربری</label>
+        <input type="text" id="reg-username" placeholder="ali_m" autocomplete="username">
+      </div>
+      <div class="input-group">
+        <label>رمز عبور</label>
+        <input type="password" id="reg-pass" placeholder="حداقل ۶ کاراکتر" autocomplete="new-password">
+      </div>
+      <button class="btn-primary" onclick="doRegister()">ساخت حساب رایگان</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ APP ══════════════════════ -->
+<div id="app-screen">
+  <div class="sidebar-backdrop" id="backdrop" onclick="closeSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="user-badge">
+        <div class="avatar" id="user-avatar">ع</div>
+        <div class="user-info">
+          <h3 id="user-display-name">کاربر</h3>
+          <p id="user-display-email">email</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-nav">
+      <div class="nav-section-title">منو</div>
+      <button class="nav-item active" onclick="showPage('home', this)">
+        <span>🏠</span> خانه
+        <span class="badge" id="badge-today">0</span>
+      </button>
+      <button class="nav-item" onclick="showPage('todos', this)">
+        <span>✅</span> کارها
+        <span class="badge" id="badge-todos">0</span>
+      </button>
+      <button class="nav-item" onclick="showPage('habits', this)">
+        <span>🔥</span> عادت‌ها
+      </button>
+      <button class="nav-item" onclick="showPage('notes', this)">
+        <span>📝</span> یادداشت‌ها
+        <span class="badge" id="badge-notes">0</span>
+      </button>
+      <button class="nav-item" onclick="showPage('finance', this)">
+        <span>💰</span> مالی
+      </button>
+
+      <div class="nav-section-title">دسته‌بندی</div>
+      <button class="nav-item" onclick="filterByCategory('study', this)">
+        <span class="nav-dot" style="background:var(--cat-study)"></span>
+        درس و دانشگاه
+      </button>
+      <button class="nav-item" onclick="filterByCategory('life', this)">
+        <span class="nav-dot" style="background:var(--cat-life)"></span>
+        زندگی روزمره
+      </button>
+      <button class="nav-item" onclick="filterByCategory('health', this)">
+        <span class="nav-dot" style="background:var(--cat-health)"></span>
+        سلامت و ورزش
+      </button>
+      <button class="nav-item" onclick="filterByCategory('finance', this)">
+        <span class="nav-dot" style="background:var(--cat-finance)"></span>
+        مالی و خرید
+      </button>
+      <button class="nav-item" onclick="filterByCategory('social', this)">
+        <span class="nav-dot" style="background:var(--cat-social)"></span>
+        اجتماعی
+      </button>
+      <button class="nav-item" onclick="filterByCategory('personal', this)">
+        <span class="nav-dot" style="background:var(--cat-personal)"></span>
+        شخصی
+      </button>
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="doLogout()">خروج از حساب</button>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="topbar">
+      <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+      <h2 id="page-title">خانه</h2>
+      <button class="btn-add" onclick="openAddModal()" style="padding:8px 14px;font-size:13px">+ کار جدید</button>
+    </div>
+
+    <div class="content">
+
+      <!-- ──── HOME ──── -->
+      <div class="page active" id="page-home">
+        <div class="overview-grid" id="overview-grid"></div>
+        <div class="rings-row" id="rings-row"></div>
+        <div id="home-todos"></div>
+      </div>
+
+      <!-- ──── TODOS ──── -->
+      <div class="page" id="page-todos">
+        <div class="add-todo-bar">
+          <input type="text" id="quick-input" placeholder="کار جدید اضافه کن..." onkeydown="if(event.key==='Enter')quickAdd()">
+          <div class="add-controls">
+            <select class="cat-select" id="quick-cat">
+              <option value="study">📚 درس</option>
+              <option value="life">🏡 زندگی</option>
+              <option value="health">❤️ سلامت</option>
+              <option value="finance">💰 مالی</option>
+              <option value="social">👥 اجتماعی</option>
+              <option value="personal">🌟 شخصی</option>
+            </select>
+            <select class="prio-select" id="quick-prio">
+              <option value="high">🔴 فوری</option>
+              <option value="mid" selected>🟡 معمولی</option>
+              <option value="low">🟢 کم</option>
+            </select>
+            <input type="date" class="date-input" id="quick-date">
+            <button class="btn-add" onclick="quickAdd()">افزودن</button>
+          </div>
+        </div>
+
+        <div class="filters" id="filters-row">
+          <button class="filter-btn active" onclick="setFilter('all', this)">همه</button>
+          <button class="filter-btn" onclick="setFilter('pending', this)">انجام‌نشده</button>
+          <button class="filter-btn" onclick="setFilter('done', this)">تکمیل‌شده</button>
+          <button class="filter-btn" onclick="setFilter('overdue', this)">عقب‌افتاده</button>
+          <button class="filter-btn" onclick="setFilter('today', this)">امروز</button>
+        </div>
+
+        <div id="todos-container"></div>
+      </div>
+
+      <!-- ──── HABITS ──── -->
+      <div class="page" id="page-habits">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <div>
+            <h3 style="font-size:16px;font-weight:600">عادت‌های روزانه</h3>
+            <p style="font-size:12px;color:var(--text2);margin-top:3px">هر روز تیک بزن، ریسمان نشکن!</p>
+          </div>
+          <button class="btn-add" onclick="openHabitModal()">+ عادت جدید</button>
+        </div>
+        <div class="habit-grid" id="habit-grid"></div>
+      </div>
+
+      <!-- ──── NOTES ──── -->
+      <div class="page" id="page-notes">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <h3 style="font-size:16px;font-weight:600">یادداشت‌ها</h3>
+          <button class="btn-add" onclick="openNoteModal()">+ یادداشت جدید</button>
+        </div>
+        <div class="notes-grid" id="notes-grid"></div>
+      </div>
+
+      <!-- ──── FINANCE ──── -->
+      <div class="page" id="page-finance">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <h3 style="font-size:16px;font-weight:600">مدیریت مالی</h3>
+          <button class="btn-add" onclick="openTransModal()">+ تراکنش جدید</button>
+        </div>
+        <div class="finance-summary" id="finance-summary"></div>
+        <div class="transactions" id="transactions-list"></div>
+      </div>
+
+    </div><!-- end content -->
+  </div><!-- end main -->
+</div><!-- end app-screen -->
+
+<!-- ══════════════════════ MODALS ══════════════════════ -->
+
+<!-- Add Todo Modal -->
+<div class="modal-overlay" id="modal-add">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>کار جدید</h3>
+      <button class="btn-close" onclick="closeModal('modal-add')">✕</button>
+    </div>
+    <div class="modal-form">
+      <div class="input-group">
+        <label>عنوان</label>
+        <input type="text" id="modal-title" placeholder="چیکار داری؟" autocomplete="off">
+      </div>
+      <div class="input-group">
+        <label>دسته‌بندی</label>
+        <select class="cat-select" id="modal-cat" style="width:100%;padding:12px 14px">
+          <option value="study">📚 درس و دانشگاه</option>
+          <option value="life">🏡 زندگی روزمره</option>
+          <option value="health">❤️ سلامت و ورزش</option>
+          <option value="finance">💰 مالی و خرید</option>
+          <option value="social">👥 اجتماعی</option>
+          <option value="personal">🌟 شخصی</option>
+        </select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="input-group">
+          <label>اولویت</label>
+          <select class="prio-select" id="modal-prio" style="width:100%;padding:12px 14px">
+            <option value="high">🔴 فوری</option>
+            <option value="mid" selected>🟡 معمولی</option>
+            <option value="low">🟢 کم</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>مهلت</label>
+          <input type="date" class="date-input" id="modal-date" style="width:100%">
+        </div>
+      </div>
+      <div class="input-group">
+        <label>توضیحات (اختیاری)</label>
+        <textarea id="modal-notes" placeholder="جزئیات بیشتر..."></textarea>
+      </div>
+      <button class="btn-primary" onclick="addTodoFromModal()">ذخیره</button>
+    </div>
+  </div>
+</div>
+
+<!-- Habit Modal -->
+<div class="modal-overlay" id="modal-habit">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>عادت جدید</h3>
+      <button class="btn-close" onclick="closeModal('modal-habit')">✕</button>
+    </div>
+    <div class="modal-form">
+      <div class="input-group">
+        <label>نام عادت</label>
+        <input type="text" id="habit-name" placeholder="مثلاً: ۳۰ دقیقه ورزش" autocomplete="off">
+      </div>
+      <div class="input-group">
+        <label>ایموجی</label>
+        <input type="text" id="habit-emoji" placeholder="🏃" maxlength="2">
+      </div>
+      <button class="btn-primary" onclick="addHabit()">ذخیره</button>
+    </div>
+  </div>
+</div>
+
+<!-- Note Modal -->
+<div class="modal-overlay" id="modal-note">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>یادداشت جدید</h3>
+      <button class="btn-close" onclick="closeModal('modal-note')">✕</button>
+    </div>
+    <div class="modal-form">
+      <div class="input-group">
+        <label>عنوان</label>
+        <input type="text" id="note-title" placeholder="موضوع یادداشت" autocomplete="off">
+      </div>
+      <div class="input-group">
+        <label>متن</label>
+        <textarea id="note-body" placeholder="یادداشت خودت..." style="min-height:140px"></textarea>
+      </div>
+      <button class="btn-primary" onclick="addNote()">ذخیره</button>
+    </div>
+  </div>
+</div>
+
+<!-- Transaction Modal -->
+<div class="modal-overlay" id="modal-trans">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>تراکنش جدید</h3>
+      <button class="btn-close" onclick="closeModal('modal-trans')">✕</button>
+    </div>
+    <div class="modal-form">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="input-group">
+          <label>نوع</label>
+          <select id="trans-type" class="cat-select" style="width:100%;padding:12px 14px">
+            <option value="income">درآمد ➕</option>
+            <option value="expense">هزینه ➖</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>مبلغ (تومان)</label>
+          <input type="number" id="trans-amount" placeholder="0" style="background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:13px 16px;color:var(--text);font-family:Inter,sans-serif;font-size:14px;outline:none;direction:ltr">
+        </div>
+      </div>
+      <div class="input-group">
+        <label>توضیح</label>
+        <input type="text" id="trans-desc" placeholder="مثلاً: شهریه دانشگاه" autocomplete="off">
+      </div>
+      <div class="input-group">
+        <label>آیکون</label>
+        <input type="text" id="trans-icon" placeholder="🎓" maxlength="2">
+      </div>
+      <button class="btn-primary" onclick="addTransaction()">ذخیره</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ SCRIPT ══════════════════════ -->
+<script>
+// ── DATA LAYER (localStorage, key per user) ──────────────────
+
+let currentUser = null;
+
+const DB = {
+  getKey: (key) => `lt_${currentUser}_${key}`,
+  get: (key) => JSON.parse(localStorage.getItem(`lt_${currentUser}_${key}`) || 'null'),
+  set: (key, val) => localStorage.setItem(`lt_${currentUser}_${key}`, JSON.stringify(val)),
+};
+
+// ── USERS ───────────────────────────────────────────────────
+
+function getUsers() { return JSON.parse(localStorage.getItem('lt_users') || '{}'); }
+function saveUsers(u) { localStorage.setItem('lt_users', JSON.stringify(u)); }
+
+// ── AUTH ─────────────────────────────────────────────────────
+
+function switchTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register')));
+  document.getElementById('form-login').style.display = tab==='login' ? 'flex' : 'none';
+  document.getElementById('form-register').style.display = tab==='register' ? 'flex' : 'none';
+  document.getElementById('auth-error').style.display = 'none';
+}
+
+function showError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function doLogin() {
+  const userInput = document.getElementById('login-user').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  if (!userInput || !pass) return showError('همه فیلدها الزامی است');
+  const users = getUsers();
+  const uid = Object.keys(users).find(k => users[k].email===userInput || users[k].username===userInput);
+  if (!uid || users[uid].pass !== btoa(pass)) return showError('نام کاربری یا رمز اشتباه است');
+  localStorage.setItem('lt_session', uid);
+  loadUser(uid);
+}
+
+function doRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const username = document.getElementById('reg-username').value.trim();
+  const pass = document.getElementById('reg-pass').value;
+  if (!name||!email||!username||!pass) return showError('همه فیلدها الزامی است');
+  if (pass.length < 6) return showError('رمز باید حداقل ۶ کاراکتر باشد');
+  const users = getUsers();
+  const exists = Object.values(users).some(u => u.email===email || u.username===username);
+  if (exists) return showError('ایمیل یا نام کاربری قبلاً ثبت شده');
+  const uid = 'u_' + Date.now();
+  users[uid] = { name, email, username, pass: btoa(pass) };
+  saveUsers(users);
+  localStorage.setItem('lt_session', uid);
+  seedDefaultData(uid);
+  loadUser(uid);
+}
+
+function doLogout() {
+  localStorage.removeItem('lt_session');
+  currentUser = null;
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('auth-screen').style.display = 'flex';
+}
+
+function seedDefaultData(uid) {
+  currentUser = uid;
+  const todos = [
+    { id: tid(), title: 'مطالعه فصل ۳ کتاب ریاضی', cat: 'study', prio: 'high', done: false, date: todayStr(), notes: '', created: Date.now() },
+    { id: tid(), title: '۳۰ دقیقه پیاده‌روی', cat: 'health', prio: 'mid', done: false, date: todayStr(), notes: '', created: Date.now() },
+    { id: tid(), title: 'خرید مواد غذایی هفتگی', cat: 'life', prio: 'mid', done: false, date: '', notes: '', created: Date.now() },
+    { id: tid(), title: 'پرداخت قبض برق', cat: 'finance', prio: 'high', done: false, date: todayStr(), notes: '', created: Date.now() },
+    { id: tid(), title: 'تماس با خانواده', cat: 'social', prio: 'low', done: true, date: '', notes: '', created: Date.now() },
+  ];
+  DB.set('todos', todos);
+  DB.set('habits', [
+    { id: tid(), name: 'ورزش صبحگاهی', emoji: '🏃', streak: 3, checkedToday: false },
+    { id: tid(), name: 'مطالعه ۱ ساعته', emoji: '📖', streak: 5, checkedToday: false },
+    { id: tid(), name: 'نوشیدن آب کافی', emoji: '💧', streak: 7, checkedToday: false },
+    { id: tid(), name: 'تمدید ذهن', emoji: '🧘', streak: 1, checkedToday: false },
+  ]);
+  DB.set('notes', [
+    { id: tid(), title: 'ایده‌های پروژه', body: 'ساخت اپ مدیریت وظایف با هوش مصنوعی...', created: Date.now() },
+  ]);
+  DB.set('transactions', [
+    { id: tid(), type: 'income', amount: 2000000, desc: 'بورسیه دانشگاه', icon: '🎓', date: Date.now() },
+    { id: tid(), type: 'expense', amount: 500000, desc: 'شهریه آموزشگاه', icon: '📚', date: Date.now() },
+    { id: tid(), type: 'expense', amount: 150000, desc: 'خرید کتاب', icon: '📗', date: Date.now() },
+  ]);
+}
+
+function loadUser(uid) {
+  currentUser = uid;
+  const users = getUsers();
+  const user = users[uid];
+  document.getElementById('user-display-name').textContent = user.name;
+  document.getElementById('user-display-email').textContent = user.email;
+  document.getElementById('user-avatar').textContent = user.name[0];
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+  renderAll();
+}
+
+// ── UTILS ────────────────────────────────────────────────────
+
+function tid() { return Math.random().toString(36).slice(2, 10); }
+function todayStr() { return new Date().toISOString().slice(0,10); }
+function fmtDate(s) {
+  if (!s) return '';
+  const d = new Date(s + 'T00:00:00');
+  return d.toLocaleDateString('fa-IR');
+}
+
+const catInfo = {
+  study:   { label:'درس', emoji:'📚', color:'var(--cat-study)' },
+  life:    { label:'زندگی', emoji:'🏡', color:'var(--cat-life)' },
+  health:  { label:'سلامت', emoji:'❤️', color:'var(--cat-health)' },
+  finance: { label:'مالی', emoji:'💰', color:'var(--cat-finance)' },
+  social:  { label:'اجتماعی', emoji:'👥', color:'var(--cat-social)' },
+  personal:{ label:'شخصی', emoji:'🌟', color:'var(--cat-personal)' },
+};
+
+// ── STATE ────────────────────────────────────────────────────
+
+let activeFilter = 'all';
+let activeCatFilter = null;
+
+// ── PAGES ────────────────────────────────────────────────────
+
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  activeCatFilter = null;
+  const titles = { home:'خانه', todos:'کارها', habits:'عادت‌ها', notes:'یادداشت‌ها', finance:'مالی' };
+  document.getElementById('page-title').textContent = titles[name] || name;
+  renderAll();
+  closeSidebar();
+}
+
+function filterByCategory(cat, btn) {
+  activeCatFilter = cat;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-todos').classList.add('active');
+  document.getElementById('page-title').textContent = catInfo[cat].emoji + ' ' + catInfo[cat].label;
+  renderTodos();
+  closeSidebar();
+}
+
+// ── SIDEBAR ──────────────────────────────────────────────────
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('backdrop').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('backdrop').classList.remove('open');
+}
+
+// ── RENDER ALL ───────────────────────────────────────────────
+
+function renderAll() {
+  renderHome();
+  renderTodos();
+  renderHabits();
+  renderNotes();
+  renderFinance();
+  updateBadges();
+}
+
+// ── HOME ─────────────────────────────────────────────────────
+
+function renderHome() {
+  const todos = DB.get('todos') || [];
+  const today = todayStr();
+  const pending = todos.filter(t => !t.done);
+  const todayItems = todos.filter(t => t.date===today);
+  const done = todos.filter(t => t.done);
+  const overdue = todos.filter(t => !t.done && t.date && t.date < today);
+
+  document.getElementById('overview-grid').innerHTML = `
+    <div class="overview-card" style="border-color:rgba(124,92,191,.3)">
+      <div class="ov-icon">📋</div>
+      <div class="ov-num">${todos.length}</div>
+      <div class="ov-label">کل وظایف</div>
+    </div>
+    <div class="overview-card" style="border-color:rgba(91,156,245,.3)">
+      <div class="ov-icon">📅</div>
+      <div class="ov-num">${todayItems.length}</div>
+      <div class="ov-label">امروز</div>
+    </div>
+    <div class="overview-card" style="border-color:rgba(78,203,140,.3)">
+      <div class="ov-icon">✅</div>
+      <div class="ov-num">${done.length}</div>
+      <div class="ov-label">انجام‌شده</div>
+    </div>
+    <div class="overview-card" style="border-color:rgba(224,92,124,.3)">
+      <div class="ov-icon">⏰</div>
+      <div class="ov-num">${overdue.length}</div>
+      <div class="ov-label">عقب‌افتاده</div>
+    </div>
+  `;
+
+  // rings
+  const cats = ['study','life','health','finance','social','personal'];
+  document.getElementById('rings-row').innerHTML = cats.map(c => {
+    const catTodos = todos.filter(t => t.cat===c);
+    const catDone = catTodos.filter(t => t.done).length;
+    const total = catTodos.length || 1;
+    const pct = Math.round(catDone/total*100);
+    const r = 18, circ = 2*Math.PI*r;
+    const dash = (pct/100)*circ;
+    return `
+      <div class="ring-card" onclick="filterByCategory('${c}',null)">
+        <div class="ring-wrap">
+          <svg width="44" height="44" viewBox="0 0 44 44">
+            <circle cx="22" cy="22" r="${r}" fill="none" stroke="var(--border)" stroke-width="3.5"/>
+            <circle cx="22" cy="22" r="${r}" fill="none" stroke="${catInfo[c].color}" stroke-width="3.5"
+              stroke-dasharray="${dash} ${circ}" stroke-linecap="round"/>
+          </svg>
+          <div class="ring-label" style="color:${catInfo[c].color}">${pct}%</div>
+        </div>
+        <div class="ring-info">
+          <h4>${catInfo[c].emoji} ${catInfo[c].label}</h4>
+          <p>${catDone}/${catTodos.length}</p>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // upcoming today
+  const upcoming = todos.filter(t => !t.done && (t.date===today || !t.date)).slice(0,5);
+  document.getElementById('home-todos').innerHTML = `
+    <div class="section-header">
+      <h3>برای امروز</h3>
+      <div class="section-line"></div>
+    </div>
+    ${upcoming.length ? upcoming.map(t => todoHTML(t)).join('') : '<div class="empty-state"><div class="empty-icon">🎉</div><p>همه کارها تموم شدن!</p></div>'}
+  `;
+}
+
+// ── TODOS ────────────────────────────────────────────────────
+
+function renderTodos() {
+  const all = DB.get('todos') || [];
+  const today = todayStr();
+  let items = [...all];
+
+  if (activeCatFilter) items = items.filter(t => t.cat===activeCatFilter);
+
+  if (activeFilter==='pending') items = items.filter(t => !t.done);
+  else if (activeFilter==='done') items = items.filter(t => t.done);
+  else if (activeFilter==='overdue') items = items.filter(t => !t.done && t.date && t.date < today);
+  else if (activeFilter==='today') items = items.filter(t => t.date===today);
+
+  // group
+  const pending = items.filter(t => !t.done);
+  const done = items.filter(t => t.done);
+
+  let html = '';
+  if (pending.length) {
+    html += `<div class="todo-section"><div class="section-header"><h3>در انتظار (${pending.length})</h3><div class="section-line"></div></div>`;
+    html += pending.map(t => todoHTML(t)).join('');
+    html += '</div>';
+  }
+  if (done.length) {
+    html += `<div class="todo-section"><div class="section-header"><h3>تکمیل‌شده (${done.length})</h3><div class="section-line"></div></div>`;
+    html += done.map(t => todoHTML(t)).join('');
+    html += '</div>';
+  }
+  if (!items.length) {
+    html = '<div class="empty-state"><div class="empty-icon">📭</div><p>هیچ وظیفه‌ای پیدا نشد</p></div>';
+  }
+
+  const container = document.getElementById('todos-container');
+  if (container) container.innerHTML = html;
+}
+
+function todoHTML(t) {
+  const today = todayStr();
+  const isOverdue = !t.done && t.date && t.date < today;
+  const cat = catInfo[t.cat] || catInfo.personal;
+  return `
+    <div class="todo-item ${t.done?'done':''}" id="todo-${t.id}">
+      <button class="todo-check ${t.done?'checked':''}" onclick="toggleTodo('${t.id}')"></button>
+      <div class="todo-body">
+        <div class="todo-title">${escHtml(t.title)}</div>
+        <div class="todo-meta">
+          <span class="cat-badge" style="color:${cat.color}">${cat.emoji} ${cat.label}</span>
+          <span class="prio-badge prio-${t.prio}">${t.prio==='high'?'فوری':t.prio==='mid'?'معمولی':'کم'}</span>
+          ${t.date ? `<span class="due-badge ${isOverdue?'overdue':''}">📅 ${fmtDate(t.date)}</span>` : ''}
+        </div>
+      </div>
+      <div class="todo-actions">
+        <button class="todo-btn del" onclick="deleteTodo('${t.id}')">🗑</button>
+      </div>
+    </div>
+  `;
+}
+
+function toggleTodo(id) {
+  const todos = DB.get('todos') || [];
+  const t = todos.find(t => t.id===id);
+  if (t) { t.done = !t.done; DB.set('todos', todos); renderAll(); }
+}
+
+function deleteTodo(id) {
+  const todos = (DB.get('todos')||[]).filter(t => t.id!==id);
+  DB.set('todos', todos);
+  renderAll();
+}
+
+function quickAdd() {
+  const title = document.getElementById('quick-input').value.trim();
+  if (!title) return;
+  const todo = {
+    id: tid(), title,
+    cat: document.getElementById('quick-cat').value,
+    prio: document.getElementById('quick-prio').value,
+    date: document.getElementById('quick-date').value,
+    done: false, notes: '', created: Date.now()
+  };
+  const todos = DB.get('todos') || [];
+  todos.unshift(todo);
+  DB.set('todos', todos);
+  document.getElementById('quick-input').value = '';
+  document.getElementById('quick-date').value = '';
+  renderAll();
+}
+
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderTodos();
+}
+
+// ── HABITS ───────────────────────────────────────────────────
+
+function renderHabits() {
+  const habits = DB.get('habits') || [];
+  const grid = document.getElementById('habit-grid');
+  if (!grid) return;
+  grid.innerHTML = habits.length ? habits.map(h => `
+    <div class="habit-card ${h.checkedToday?'done-today':''}" onclick="toggleHabit('${h.id}')">
+      <div class="habit-emoji">${h.emoji||'⭐'}</div>
+      <div class="habit-name">${escHtml(h.name)}</div>
+      <div class="habit-streak">🔥 ${h.streak} روز</div>
+      ${h.checkedToday ? '<div style="font-size:11px;color:var(--success);margin-top:4px">✓ امروز انجام دادی</div>' : ''}
+    </div>
+  `).join('') : '<div class="empty-state"><div class="empty-icon">🔥</div><p>اولین عادتت رو اضافه کن</p></div>';
+}
+
+function toggleHabit(id) {
+  const habits = DB.get('habits') || [];
+  const h = habits.find(h => h.id===id);
+  if (h) {
+    if (!h.checkedToday) { h.streak++; h.checkedToday = true; }
+    else { h.streak = Math.max(0,h.streak-1); h.checkedToday = false; }
+    DB.set('habits', habits);
+    renderHabits();
+  }
+}
+
+// ── NOTES ────────────────────────────────────────────────────
+
+function renderNotes() {
+  const notes = DB.get('notes') || [];
+  const grid = document.getElementById('notes-grid');
+  if (!grid) return;
+  grid.innerHTML = notes.length ? notes.map(n => `
+    <div class="note-card">
+      <h4>${escHtml(n.title)}</h4>
+      <p>${escHtml(n.body.slice(0,120))}${n.body.length>120?'...':''}</p>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="note-date">${new Date(n.created).toLocaleDateString('fa-IR')}</div>
+        <button class="todo-btn del" onclick="deleteNote('${n.id}')">🗑</button>
+      </div>
+    </div>
+  `).join('') : '<div class="empty-state"><div class="empty-icon">📝</div><p>هنوز یادداشتی نداری</p></div>';
+}
+
+function deleteNote(id) {
+  DB.set('notes', (DB.get('notes')||[]).filter(n => n.id!==id));
+  renderNotes();
+  updateBadges();
+}
+
+// ── FINANCE ──────────────────────────────────────────────────
+
+function renderFinance() {
+  const tx = DB.get('transactions') || [];
+  const income = tx.filter(t=>t.type==='income').reduce((a,t)=>a+t.amount,0);
+  const expense = tx.filter(t=>t.type==='expense').reduce((a,t)=>a+t.amount,0);
+  const balance = income - expense;
+
+  const fmt = n => n.toLocaleString('fa-IR');
+
+  const fs = document.getElementById('finance-summary');
+  if (fs) fs.innerHTML = `
+    <div class="fin-card income"><div class="fin-num">${fmt(income)}</div><div class="fin-label">درآمد</div></div>
+    <div class="fin-card expense"><div class="fin-num">${fmt(expense)}</div><div class="fin-label">هزینه</div></div>
+    <div class="fin-card balance"><div class="fin-num">${fmt(balance)}</div><div class="fin-label">مانده</div></div>
+  `;
+
+  const tl = document.getElementById('transactions-list');
+  if (tl) tl.innerHTML = tx.length ? tx.slice().reverse().map(t => `
+    <div class="transaction-item">
+      <div class="tx-icon" style="background:${t.type==='income'?'rgba(78,203,140,.1)':'rgba(224,92,124,.1)'}">${t.icon||'💸'}</div>
+      <div class="tx-info">
+        <h4>${escHtml(t.desc)}</h4>
+        <p>${new Date(t.date).toLocaleDateString('fa-IR')}</p>
+      </div>
+      <div class="tx-amount ${t.type==='income'?'inc':'exp'}">${t.type==='income'?'+':'-'}${t.amount.toLocaleString('fa-IR')}</div>
+    </div>
+  `).join('') : '<div class="empty-state"><div class="empty-icon">💰</div><p>هنوز تراکنشی ثبت نشده</p></div>';
+}
+
+// ── BADGES ───────────────────────────────────────────────────
+
+function updateBadges() {
+  const todos = DB.get('todos') || [];
+  const notes = DB.get('notes') || [];
+  const pending = todos.filter(t => !t.done);
+  const todayItems = todos.filter(t => t.date===todayStr() && !t.done);
+  document.getElementById('badge-todos').textContent = pending.length || '';
+  document.getElementById('badge-today').textContent = todayItems.length || '';
+  document.getElementById('badge-notes').textContent = notes.length || '';
+}
+
+// ── MODALS ───────────────────────────────────────────────────
+
+function openAddModal() { document.getElementById('modal-add').classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function openHabitModal() { document.getElementById('modal-habit').classList.add('open'); }
+function openNoteModal() { document.getElementById('modal-note').classList.add('open'); }
+function openTransModal() { document.getElementById('modal-trans').classList.add('open'); }
+
+function addTodoFromModal() {
+  const title = document.getElementById('modal-title').value.trim();
+  if (!title) return;
+  const todo = {
+    id: tid(), title,
+    cat: document.getElementById('modal-cat').value,
+    prio: document.getElementById('modal-prio').value,
+    date: document.getElementById('modal-date').value,
+    notes: document.getElementById('modal-notes').value,
+    done: false, created: Date.now()
+  };
+  const todos = DB.get('todos') || [];
+  todos.unshift(todo);
+  DB.set('todos', todos);
+  document.getElementById('modal-title').value = '';
+  document.getElementById('modal-notes').value = '';
+  document.getElementById('modal-date').value = '';
+  closeModal('modal-add');
+  renderAll();
+}
+
+function addHabit() {
+  const name = document.getElementById('habit-name').value.trim();
+  const emoji = document.getElementById('habit-emoji').value || '⭐';
+  if (!name) return;
+  const habits = DB.get('habits') || [];
+  habits.push({ id: tid(), name, emoji, streak: 0, checkedToday: false });
+  DB.set('habits', habits);
+  document.getElementById('habit-name').value = '';
+  document.getElementById('habit-emoji').value = '';
+  closeModal('modal-habit');
+  renderHabits();
+}
+
+function addNote() {
+  const title = document.getElementById('note-title').value.trim();
+  const body = document.getElementById('note-body').value.trim();
+  if (!title) return;
+  const notes = DB.get('notes') || [];
+  notes.unshift({ id: tid(), title, body, created: Date.now() });
+  DB.set('notes', notes);
+  document.getElementById('note-title').value = '';
+  document.getElementById('note-body').value = '';
+  closeModal('modal-note');
+  renderNotes();
+  updateBadges();
+}
+
+function addTransaction() {
+  const type = document.getElementById('trans-type').value;
+  const amount = parseInt(document.getElementById('trans-amount').value) || 0;
+  const desc = document.getElementById('trans-desc').value.trim();
+  const icon = document.getElementById('trans-icon').value || (type==='income'?'💰':'💸');
+  if (!desc || !amount) return;
+  const tx = DB.get('transactions') || [];
+  tx.unshift({ id: tid(), type, amount, desc, icon, date: Date.now() });
+  DB.set('transactions', tx);
+  document.getElementById('trans-amount').value = '';
+  document.getElementById('trans-desc').value = '';
+  document.getElementById('trans-icon').value = '';
+  closeModal('modal-trans');
+  renderFinance();
+}
+
+// close modal on backdrop
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target===m) m.classList.remove('open'); });
+});
+
+// ── UTIL ─────────────────────────────────────────────────────
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── BOOT ─────────────────────────────────────────────────────
+
+(function boot() {
+  const session = localStorage.getItem('lt_session');
+  if (session && getUsers()[session]) {
+    loadUser(session);
+  }
+  // enter on auth inputs
+  ['login-pass','reg-pass'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('keydown', e => {
+      if (e.key==='Enter') id.startsWith('login') ? doLogin() : doRegister();
+    });
+  });
+})();
+</script>
+</body>
+</html>
